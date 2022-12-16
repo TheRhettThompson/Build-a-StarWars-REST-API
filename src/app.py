@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Characters, Planets
+from models import db, User, Characters, Planets, Favorites
 #from models import Person
 
 app = Flask(__name__)
@@ -26,27 +26,51 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+user = [
+    {
+        'id' : 1,
+        'name' : 'Joe Shmoe',
+        'email' : 'JBoogie@aol.com',      
+    },    
+
+    {
+        'id' : 2,
+        'name' : 'Jane Doe',
+        'email' : 'JDoeADeer95@gmail.com',   
+    }
+]
+
 characters = [
     {
         'id': 1,
-        'name': 'Luke Skywalker'
+        'name': 'Luke Skywalker',
+        'planet_from': 'Tatooine',
+        'birth_year': '19 BBY'
     },
 
     {
         'id': 2,
-        'name': 'Darth Vader'
+        'name': 'Darth Vader',
+        'planet_from': 'Tatooine',
+        'birth_year': '41 BBY'
     }
 ]
 
 planets = [
     {
-        'id': 1,
-        'name': 'Tatooine'
+        'planet_id': 1,
+        'name': 'Tatooine',
+        'diameter': '10465',
+        'population': '200000',
+        'climate': 'arid',
     },
 
     {
        'id': 2,
-       'name': 'Naboo' 
+       'name': 'Naboo', 
+       'diameter': '10465',
+       'population': '4500000000',
+       'climate': 'temperate',
     }
 ]
 
@@ -77,6 +101,11 @@ def get_characters():
 @app.route('/planets' , methods=['GET'])
 def get_planets():
     json_text = jsonify(planets)
+    return json_text, 200
+
+@app.route('/favorites' , methods=['GET'])
+def get_favorites():
+    json_text = jsonify(Favorites)
     return json_text, 200
 
 # this only runs if `$ python src/app.py` is executed
