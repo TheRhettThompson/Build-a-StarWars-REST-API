@@ -92,6 +92,17 @@ vehicles = [
     }
 ]
 
+favorites = [
+    {
+        'date_added': '12/01/2022',
+        'user_id': '2',
+        'favorite_characters': 'Luke Skywalker',
+        'favorite_planets': 'Naboo',
+        'favorite_vehicles': 'car'
+    }
+
+
+]
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -132,15 +143,69 @@ def get_favorites():
     json_text = jsonify(Favorites)
     return json_text, 200
 
-@app.route('/characters/<int:id>', methods=['GET']) #this method is used in case table is on our files #whatever is after characters has to be an Integer (the ID)
+@app.route('/characters/<int:id>', methods=['GET']) #this method is used to pull by index, not by id number since table is hardcoded on our files #whatever is after characters has to be an Integer (the ID)
 def get_single_characters(id):
-    single_character = characters[id]
-    return jsonify(x.to_dict() for x in all_characters), 200
+    #single_character = characters[id]
+    single_character = Characters.query.get(id)
+    #return jsonify(x.to_dict() for x in all_characters), 200
+    return jsonify()
 
 @app.route('/characters2', methods=['GET']) #Correct way (instead of line 135 if we have a database server
 def get_characters2():
     all_characters = Characters.query.all()
     return json_text, 200
+
+@app.route('/planets/<int:id>', methods=['GET']) #this method is used to pull by index, not by id number since table is hardcoded on our files #whatever is after characters has to be an Integer (the ID)
+def get_single_planet(id):
+    single_planet = planets[id]
+    return jsonify(x.to_dict() for x in all_planets), 200
+
+@app.route('/vehicles/<int:id>', methods=['GET']) #this method is used to pull by index, not by id number since table is hardcoded on our files #whatever is after characters has to be an Integer (the ID)
+def get_single_vehicle(id):
+    single_vehicle = vehicles[id]
+    return jsonify(x.to_dict() for x in all_vehicles), 200
+
+#adding characters to a user's favorites:
+@app.route('/users<int:id>/favorites/', methods=['GET']) #int:id is looking for a specific user
+def get_all_favorites(id):
+    user = User.query.get(id) #I want to look in User table, make a query, get request by ID number
+    user.to_dict() #converts user into  dictionary (items within the curly brackets)
+    user_favorites = {
+        'favorite_characters': user.favorite_characters, #user is now a dictionary, since user. with a dot
+        'favorite_planets': user.favorite_planets,
+        'favorite_vehicles': user.favorite_vehicles
+    }
+    return jsonify(user_favorites) , 200
+
+@app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST'])#find user, find their favorites, looking inside their characters inside their favorite
+def add_to_favorite_characters(id, name): #passing through the id of the user
+    body = request.get_json() #body is converted to json and needs to match up to our POST or it won't POST properly #whenever doing POST request must make sure request is in correct format
+    if request.method == 'POST': #IF this request is a POST, we're going to do this: 
+        user = User.query.get(id) #which user we want to add
+        character = Characters.query.get(name) #which character we want to add #we are going to look inside Character db to see what we're going to add
+        user.favorite_characters.append(character) #append adds to favorite characters list
+        db.session.commit() #commit saves to database
+        return 'Favorite character has been added', 200
+
+@app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST', 'DELETE'])#find user, find their favorites, looking inside their characters inside their favorite
+def add_to_favorite_characters(id, name): #passing through the id of the user
+    body = request.get_json() #body is converted to json and needs to match up to our POST or it won't POST properly #whenever doing POST request must make sure request is in correct format
+    if request.method == 'POST': #IF this request is a POST, we're going to do this: 
+        user = User.query.get(id) #which user we want to add
+        character = Characters.query.get(name) #which character we want to add #we are going to look inside Character db to see what we're going to add
+        user.favorite_characters.append(character) #append adds to favorite characters list
+        db.session.commit() #commit saves to database
+        return 'Favorite character has been added', 200
+
+    if request.method == 'DELETE':
+        user = User.query.get(id)
+        character = Characters.query.get(name) #Capital letters means tables, lower case is a variable so can be saved as whatever I want
+        user.favorite_characters.remove(character)
+        db.session.commit()
+        return 'Character has been deleted from favorites' , 200
+    return 'POST or DELETE request was invalid', 484
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) #primary key is always last
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
@@ -83,10 +83,10 @@ class Vehicles(db.Model):
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     date_added = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, unique=True, nullable=False)
-    favorite_characters = db.Column(db.Integer)
-    favorite_planets = db.Column(db.Integer)
-    favorite_vehicles = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=False)
+    favorite_characters = db.Column(db.Integer , db.ForeignKey('characters.name')) #using name vs id so front end can see name of user's favorites instead of id numbers
+    favorite_planets = db.Column(db.Integer , db.ForeignKey('planets.name'))
+    favorite_vehicles = db.Column(db.Integer , db.ForeignKey('vehicles.name'))
 
     def __repr__(self):
         return '<Favorites %r>' % self.name
