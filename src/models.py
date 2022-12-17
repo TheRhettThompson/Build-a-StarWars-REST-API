@@ -60,6 +60,26 @@ class Planets(db.Model):
             'climate': self.climate,
         }
 
+class Vehicles(db.Model):
+    __tablename__ = 'vehicles'
+    name = db.Column(db.String, primary_key=True)
+    vehicle_id = db.Column(db.Integer, unique=True, nullable=False)
+    model = db.Column(db.String(120))
+    crew = db.Column(db.Integer)
+    vehicle_class = db.Column(db.String(120))
+
+    def __repr__(self):
+        return '<Vehicles %r>' % self.name
+
+    def serialize(self):
+        return {
+            'name': self.name,
+            'vehicle_id': self.vehicle_id,
+            'model': self.model,
+            'crew': self.crew,
+            'vehicle_class': self.vehicle_class
+        }
+
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     date_added = db.Column(db.Integer, primary_key=True)
@@ -71,7 +91,6 @@ class Favorites(db.Model):
     def __repr__(self):
         return '<Favorites %r>' % self.name
 
-
     def serialize(self):
         return {
             'date_added': self.user_id,
@@ -80,3 +99,4 @@ class Favorites(db.Model):
             'favorite_planets': self.favorite_planets,
             'favorite_vehicles': self.favorite_vehicles
         }
+
