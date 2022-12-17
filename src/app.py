@@ -177,15 +177,15 @@ def get_all_favorites(id):
     }
     return jsonify(user_favorites) , 200
 
-@app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST'])#find user, find their favorites, looking inside their characters inside their favorite
-def add_to_favorite_characters(id, name): #passing through the id of the user
-    body = request.get_json() #body is converted to json and needs to match up to our POST or it won't POST properly #whenever doing POST request must make sure request is in correct format
-    if request.method == 'POST': #IF this request is a POST, we're going to do this: 
-        user = User.query.get(id) #which user we want to add
-        character = Characters.query.get(name) #which character we want to add #we are going to look inside Character db to see what we're going to add
-        user.favorite_characters.append(character) #append adds to favorite characters list
-        db.session.commit() #commit saves to database
-        return 'Favorite character has been added', 200
+#@app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST'])#find user, find their favorites, looking inside their characters inside their favorite
+#def add_to_favorite_characters(id, name): #passing through the id of the user
+    #body = request.get_json() #body is converted to json and needs to match up to our POST or it won't POST properly #whenever doing POST request must make sure request is in correct format
+    #if request.method == 'POST': #IF this request is a POST, we're going to do this: 
+        #user = User.query.get(id) #which user we want to add
+        #character = Characters.query.get(name) #which character we want to add #we are going to look inside Character db to see what we're going to add
+        #user.favorite_characters.append(character) #append adds to favorite characters list
+        #db.session.commit() #commit saves to database
+        #return 'Favorite character has been added', 200
 
 @app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST', 'DELETE'])#find user, find their favorites, looking inside their characters inside their favorite
 def add_to_favorite_characters(id, name): #passing through the id of the user
@@ -205,7 +205,43 @@ def add_to_favorite_characters(id, name): #passing through the id of the user
         return 'Character has been deleted from favorites' , 200
     return 'POST or DELETE request was invalid', 484
 
+#This is for favorite planets
+@app.route('users<int:id>/favorites/planets/<str:planet_name>', methods=['POST', 'DELETE'])#find user, find their favorites, looking inside their characters inside their favorite
+def add_to_favorite_planets(id, name): 
+    body = request.get_json()    
+    if request.method == 'POST': 
+        user = User.query.get(id) 
+        planet = Planets.query.get(name)
+        user.favorite_planets.append(planet)  
+        db.session.commit()  
+        return 'Favorite planet has been added', 200
 
+    if request.method == 'DELETE':
+        user = User.query.get(id)
+        planet = Planets.query.get(name) #Capital letters means tables, lower case is a variable so can be saved as whatever I want
+        user.favorite_planets.remove(planet)
+        db.session.commit()
+        return 'Planet has been deleted from favorites' , 200
+    return 'POST or DELETE request was invalid', 484
+
+#This is for favorite vehicles
+# @app.route('users<int:id>/favorites/character/<str:character_name>', methods=['POST', 'DELETE'])#find user, find their favorites, looking inside their characters inside their favorite
+def add_to_favorite_vehicles(id, name): #passing through the id of the user
+    body = request.get_json() #body is converted to json and needs to match up to our POST or it won't POST properly #whenever doing POST request must make sure request is in correct format
+    if request.method == 'POST': #IF this request is a POST, we're going to do this: 
+        user = User.query.get(id) #which user we want to add
+        vehicle = Vehicles.query.get(name) #which character we want to add #we are going to look inside Character db to see what we're going to add
+        user.favorite_characters.append(vehicle) #append adds to favorite characters list
+        db.session.commit() #commit saves to database
+        return 'Favorite vehicle has been added', 200
+
+    if request.method == 'DELETE':
+        user = User.query.get(id)
+        vehicle = Vehicles.query.get(name) #Capital letters means tables, lower case is a variable so can be saved as whatever I want
+        user.favorite_vehicles.remove(vehicle)
+        db.session.commit()
+        return 'Vehicle has been deleted from favorites' , 200
+    return 'POST or DELETE request was invalid', 484    
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
